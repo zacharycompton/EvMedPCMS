@@ -7,6 +7,7 @@ library(ggrepel)
 library(cowplot)
 
 
+
 tree <- read.tree("humanMin20.nwk")
 tree
 plot(tree)
@@ -73,6 +74,7 @@ plotTree(tree,type="fan", ftype = "i")
 ## read csv file
 
 primates<-read.csv("min20516.csv",header = TRUE)
+primates<-filter(primates, Class == "Mammalia")
 #view(primates)
 
 #replaces all space characters in species value of each row to an "_"
@@ -89,10 +91,8 @@ newtips<-str_remove_all(newtips,"[1234567890]")
 newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 
 ## pruning the tree
-pruned.tree <- tree
-tree$tip.label <- newtips
-drop.tip(
-  pruned.tree, setdiff(
+pruned.tree<-drop.tip(
+  tree, setdiff(
     tree$tip.label, includedSpecies))
 keep.tip(pruned.tree,pruned.tree$tip.label)
 
@@ -113,35 +113,55 @@ cancerRelate<-left_join(primates, homoRelate, by = "Species", copy = TRUE)
 
 #Neo
 
-cutCancer<-cancerRelate[,c(9,10,13,42,43,44),drop=FALSE] 
-rownames(cutCancer)<-cutCancer$Species
-cutCancer<-na.omit(cutCancer)
+cutNeo<-cancerRelate[,c(9,10,11,13,42,43,44),drop=FALSE] 
+rownames(cutNeo)<-cutNeo$Species
+cutNeo<-na.omit(cutNeo)
 
 
-cutCancer$relatedness <- as.numeric(cutCancer$relatedness)
+cutNeo$relatedness <- as.numeric(cutNeo$relatedness)
 
-view(cutCancer)
+view(cutNeo)
 
-SE<-setNames(cutCancer$SE_simple,cutCancer$Species)[rownames(cutCancer)]
+SE<-setNames(cutNeo$SE_simple,cutNeo$Species)[rownames(cutNeo)]
 
-relate<-cutCancer$relatedness
+relate<-cutNeo$relatedness
 
 
 
-pgls.model <- pglsSEyPagel(NeoplasiaPrevalence~relatedness,data=cutCancer,
+pgls.modelNeo <- pglsSEyPagel(NeoplasiaPrevalence~relatedness,data=cutNeo,
                            tree=pruned.tree,method="ML",se=SE)
-summary(pgls.model)
+summary(pgls.modelNeo)
 
 variable_relate<- data.frame(relatedness = c(0))
-hs_pred <- predict(pgls.model, newdata = variable_relate)
+hs_predNeo <- predict(pgls.modelNeo, newdata = variable_relate)
 
-hs_pred[1]
+hs_predNeo[1]
+
+p.v.neo<-summary(pgls.modelNeo)$tTable
+p.v.neo<-signif(p.v.neo[2,4], digits = 3)
+
+intersecNeo<-round(hs_predNeo[1], digits = 4)*100
+
+
+ggplot(cutNeo, aes(y=NeoplasiaPrevalence*100, x=relatedness))+
+  scale_y_continuous(
+    breaks = c(0,intersecNeo, 25,45),
+    labels = c(0,intersecNeo, 25,45))+
+  geom_abline(intercept = coef(pgls.modelNeo)[1]*100, slope =  coef(pgls.modelNeo)[2]*100,
+              color = 'darkgrey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Neoplasia Prevalence (%)") +
+  xlab("Phylogenetic Distance from Homo Sapien") +
+  geom_point(aes(size = RecordsWithDenominators))+
+  theme(legend.position = "none")
+
 
 
 #Mal
 
 
-cutMal<-cancerRelate[,c(9,10,17,42,43,44),drop=FALSE] 
+cutMal<-cancerRelate[,c(9,10,11,17,42,43,44),drop=FALSE] 
 rownames(cutMal)<-cutMal$Species
 cutMal<-na.omit(cutMal)
 
@@ -153,16 +173,34 @@ relate<-cutMal$relatedness
 
 
 
-pgls.model <- pglsSEyPagel(MalignancyPrevalence~relatedness,data=cutMal,
+pgls.modelMal <- pglsSEyPagel(MalignancyPrevalence~relatedness,data=cutMal,
                            tree=pruned.tree,method="ML",se=SE)
-summary(pgls.model)
+summary(pgls.modelMal)
 
 variable_relate<- data.frame(relatedness = c(0))
-hs_pred <- predict(pgls.model, newdata = variable_relate)
+hs_predMal <- predict(pgls.modelMal, newdata = variable_relate)
 
-hs_pred[1]
+hs_predMal[1]
 
+intersecMal<-round(hs_predMal[1], digits = 4)*100
 
+p.v.mal<-summary(pgls.modelMal)$tTable
+p.v.mal<-signif(p.v.mal[2,4], digits = 3)
+
+#remove limits from scale y continous, add last two lines with label
+ggplot(cutMal, aes(y=MalignancyPrevalence*100, x=relatedness))+
+  scale_y_continuous(
+    breaks = c(0,intersecMal, 25,45),
+    labels = c(0,intersecMal,  25,45))+
+  geom_abline(intercept = coef(pgls.modelMal)[1]*100, slope =  coef(pgls.modelMal)[2]*100,
+              color = 'darkgrey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  geom_text_repel(label = cutMal$common_name)+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("Phylogenetic Distance from Homo Sapien") +
+  geom_point(aes(size = RecordsWithDenominators))+
+  theme(legend.position = "none")
 
 
 
