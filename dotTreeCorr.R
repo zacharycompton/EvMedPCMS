@@ -47,9 +47,12 @@ corphylo(cutData$NeoplasiaPrevalence, cutData$Gestation.months., phy = pruned.tr
 length(cutData$Gestation.months.)
 length(pruned.tree$tip.label)
 
-summary(pp)
 
 name.check(pruned.tree, cutData)
+
+
+#For Matt: Pearson Correlation
+
 
 
 #transform
