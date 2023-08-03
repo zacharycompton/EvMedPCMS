@@ -157,10 +157,6 @@ ggplot(cutNeo, aes(y=NeoplasiaPrevalence*100, x=relatedness))+
   theme(legend.position = "none")
 
 
-
-#Mal
-
-
 cutMal<-cancerRelate[,c(9,10,11,17,42,43,44),drop=FALSE] 
 rownames(cutMal)<-cutMal$Species
 cutMal<-na.omit(cutMal)
@@ -201,6 +197,40 @@ ggplot(cutMal, aes(y=MalignancyPrevalence*100, x=relatedness))+
   xlab("Phylogenetic Distance from Homo Sapien") +
   geom_point(aes(size = RecordsWithDenominators))+
   theme(legend.position = "none")
+
+
+
+#Hannah: Regression with estimated human rate
+
+#estimate rate from cancer.org
+
+estRate<-40.9
+
+SE_Simple<- 1/sqrt(100000)
+
+cutMalHumanEst<-cutMal
+
+#Add a row of data to the cut mal dataframe. you need to fill in the c list with column for human row
+
+cutMalHumanEst[nrow(cutMalHumanEst) + 1,] = c()
+
+#Set up regression use line 172 and 173 to build regression. You dont need to use predict stuff.
+
+
+
+#Set up ggplot
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
