@@ -42,18 +42,26 @@ pruned.tree$edge.length[which(pruned.tree$edge.length <=0)] <- 1e-10
 rownames(cutData)<-cutData$Species
 cutData<-cutData[,c(2:6),drop=FALSE] 
 
-corphylo(cutData$NeoplasiaPrevalence, cutData$Gestation.months., phy = pruned.tree)
-
-length(cutData$Gestation.months.)
-length(pruned.tree$tip.label)
-
-
 name.check(pruned.tree, cutData)
 
 
 #For Matt: Pearson Correlation
 
 
+data <- data.frame(lapply(cutData, as.numeric))
+
+rownames(data)<-rownames(cutData)
+
+mtxData<-as.matrix(cutData)
+
+
+vcv<-vcv.phylo(pruned.tree)
+
+phyCorr<-phyl.vcv(mtxData,vcv(pruned.tree),1)
+
+#Matt: Refer to this data object to make dot tree
+
+phyCorr$R
 
 #transform
 
