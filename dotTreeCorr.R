@@ -59,6 +59,28 @@ vcv<-vcv.phylo(pruned.tree)
 
 phyCorr<-phyl.vcv(mtxData,vcv(pruned.tree),1)
 
+phyl.vcv(mtxData,vcv(pruned.tree),1)
+
+neoGest<-cov2cor(phyCorr$R)["NeoplasiaPrevalence","Gestation.months."]
+neoAdultWeight<-cov2cor(phyCorr$R)["NeoplasiaPrevalence","adult_weight.g."]
+neoLong<-cov2cor(phyCorr$R)["NeoplasiaPrevalence","max_longevity.months."]
+
+malGest<-cov2cor(phyCorr$R)["MalignancyPrevalence","Gestation.months."]
+malAdultWeight<-cov2cor(phyCorr$R)["MalignancyPrevalence","adult_weight.g."]
+malLong<-cov2cor(phyCorr$R)["MalignancyPrevalence","max_longevity.months."]
+
+
+exportCorr <- data.frame(
+  neo = c(neoGest,neoAdultWeight,neoLong), # Replace with actual values
+  mal = c(malGest,malAdultWeight,malLong)  # Replace with actual values
+)
+
+rownames(exportCorr)<-c("Gestation", "AdultWeight", "Longevity")
+
+
+
+write.csv(exportCorr, file = "/Users/walkermellon/Documents/methods/EvMedPCMS/correlationLH.csv", row.names = TRUE)
+
 #Matt: Refer to this data object to make dot tree
 
 phyCorr$R
