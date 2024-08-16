@@ -178,7 +178,7 @@ for (class_name in ClassNames) {
       fitRateTrend_sim <- fitContinuous(pruned.tree, x, model = "rate_trend")
       fitMeanTrend_sim <- fitContinuous(pruned.tree, x, model = "mean_trend")
       fitWhite_sim <- fitContinuous(pruned.tree, x, model = "white")
-      lambdarow<-data.frame(group = class_name, lambda = fitLambda_sim$opt$lambda)
+      lambdarow<-data.frame(Class = class_name, lambda = fitLambda_sim$opt$lambda)
       lambdasClass<-rbind(lambdasClass,lambdarow)
       
       
@@ -353,8 +353,11 @@ for (i in 1:nrow(modelsBestFitClass)) {
     painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state="rate_trend", anc="0")
   }else if (modelsBestFitClass$BestModel[i] == "lambda") {
     classLambda<-left_join(Class_data, lambdasClass, by = "Class")
-    if (classLambda$lambda <0.5){
+    if (classLambda$lambda[i] <0.3){
       painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state="lowlambda", anc="0")}
+    else if (classLambda$lambda[i] > 0.3 & classLambda$lambda[i] <0.7) {
+      painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state=paste("Lambda",round(classLambda$lambda[i],3) ), anc="0")
+    }
     else{
       painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state="highlambda", anc="0")
     }
@@ -380,19 +383,29 @@ for (i in 1:nrow(modelsBestFit)) {
   }else if (modelsBestFit$BestModel[i] == "rate_trend") {
     painted <- paintSubTree(painted, node=findMRCA(painted, order_data$Species), state="rate_trend", anc="0")
   }else if (modelsBestFit$BestModel[i] == "lambda") {
-    painted <- paintSubTree(painted, node=findMRCA(painted, order_data$Species), state="lambda", anc="0")
+    classLambda<-left_join(Class_data, lambdasClass, by = "Class")
+    if (classLambda$lambda[i] <0.3){
+      painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state="lowlambda", anc="0")}
+    else if (classLambda$lambda[i] >0.3 & classLambda$lambda[i] < 0.7) {
+      painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state=paste("Lambda",round(classLambda$lambda[i],3) ), anc="0")
+    }
+    else{
+      painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state="highlambda", anc="0")
+    }
   }
   
   
 }
 
+names(painted$maps[1])
+first_element_names <- lapply(painted$maps, function(x) names(x)[1])
+
+# Printing the names of the first elements
+unique(first_element_names)
 
 
-    
-
-
-colors<- c("black","purple", "#CC5500", "#008080", "#568203", "purple")
-names(colors)<-c("0","EB","lambda", "OU", "rate_trend")
+colors <- c("black", "#CC5500", "#008080", "#568203", "#2E4C6D", "pink")
+names(colors)<-c("0",unique(first_element_names))
 plotSimmap(painted, lwd=2, split.vertical=TRUE, ftype="i", fsize = 0.0000001, colors = colors)
 
 
@@ -405,5 +418,4 @@ for (i in 1:nrow(modelsBestFit)) {
 }
 
 
-add.simmap.legend(add.simmap.legend(leg=sort(unique(speciesModelsOrder)),
-                                    colors=colors[2:5]))
+add.simmap.legend(leg=names(colors)[2:6], colors=colors[2:6])
