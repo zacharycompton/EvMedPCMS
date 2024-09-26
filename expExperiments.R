@@ -281,13 +281,12 @@ dataReport <- data.frame(n = numeric(),min = numeric(), model = character(), pva
 Data <- read.csv("min1LH.csv") # Adjust filename/path as necessary
 
 # Define parameter settings
-min_necropsies_values <- c(1,5,10,20)
+min_necropsies_values <- c(20)
 #min_necropsies_values <- 20
-num_species_values <- c(50, 200)
+num_species_values <- c(50,200)
 #num_species_values <- 300
-num_simulations <- 1
+num_simulations <- 100
 tree <- read.tree("min1.nwk")
-
 
 slope_values <- c(.021, 0, -.2)  # Array of slope values
 
@@ -299,6 +298,8 @@ no_cores <- detectCores() - 1
       mamData <- Data %>% 
         filter(adult_weight > 0, !is.na(adult_weight))
       
+      mamData<-filter(mamData, Class == "Mammalia")
+      
       
       total_iterations <- num_simulations * length(slope_values) * length(num_species_values) * length(min_necropsies_values)
       current_iteration <- 0
@@ -307,6 +308,14 @@ no_cores <- detectCores() - 1
       progress_threshold <- 10
       next_progress_update <- progress_threshold
       
+      ogData<-mamData
+      
+# Define the CSV file path
+csv_file_path <- "./pglsOUSimResults812.csv"
+      
+# Initialize the CSV file by writing the header
+write.csv(data.frame(n = numeric(), min = numeric(), model = character(), pval = numeric(), simslope = numeric(), slope = numeric()), 
+  file = csv_file_path, row.names = FALSE)      
 
 run_simulation <- function(params) {
   compar_row <- data.frame(n = NA,min = NA, model = "Compar", pval = NA,simslope= NA,  slope = NA)
@@ -318,17 +327,18 @@ run_simulation <- function(params) {
   
   
   for(min_necropsies in min_necropsies_values) {
+    progress <- (current_iteration / total_iterations) * 100
+    
+    # Check if progress has reached the next 10% threshold
+    if (progress >= next_progress_update) {
+      cat(sprintf("Progress: [%-10s] %d%%\n", paste(rep("=", next_progress_update / 10), collapse = ""), next_progress_update))
+      next_progress_update <<- next_progress_update + progress_threshold
+    }
     for(num_species in num_species_values) {
       for(sim in 1:num_simulations) {
         current_iteration <- current_iteration + 1
-        progress <- (current_iteration / total_iterations) * 100
-        
-        # Check if progress has reached the next 10% threshold
-        if (progress >= next_progress_update) {
-          cat(sprintf("Progress: [%-10s] %d%%\n", paste(rep("=", next_progress_update / 10), collapse = ""), next_progress_update))
-          next_progress_update <<- next_progress_update + progress_threshold
-        }
 
+      mamData<-ogData
         
       mamData <- mamData[sample(nrow(mamData), min(num_species, nrow(mamData))), ]
       n <- nrow(mamData)
@@ -349,17 +359,30 @@ run_simulation <- function(params) {
       
       # Simulate values within the specified range
       for (i in seq_len(n)) {
+        max_attempts <- 1000  # Set a threshold for maximum attempts
+        attempts <- 0  # Initialize the counter
+        
         repeat {
+          attempts <- attempts + 1  # Increment the counter
+          #cat("simulating", i, "attempt:", attempts, "\n")  # Print simulation status
+          
           simulated_value <- rnbinom(1, size = size_necropsy, mu = mean_necropsies)
+          
           if (simulated_value >= min_value && simulated_value <= max_value) {
             simulated_necropsies[i] <- simulated_value
+            break
+          }
+          
+          if (attempts >= max_attempts) {
+            cat("Exceeded max attempts (%d) for simulation %d; using the closest valid value.\n", max_attempts, i)
+            warning(sprintf("Exceeded max attempts (%d) for simulation %d; using the closest valid value.\n", max_attempts, i))
+            simulated_necropsies[i] <- ifelse(simulated_value < min_value, min_value, max_value)
             break
           }
         }
       }
       
       mamData$SimulatedNecropsies <- simulated_necropsies
-
 
 
 #adult weight models
@@ -383,15 +406,27 @@ cutData <- cutData[!(cutData$Keep==FALSE),]
 rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simpleSim,cutData$Species)[rownames(cutData)]
 
+adult_weight<-cutData$adult_weight
+
 # Adjusting the simulation of 'simNeo' with increased variability
 adult_weightFrac<-cutData$adult_weight/max(cutData$adult_weight)
-noise_level <- sd(adult_weightFrac)*0.0000001 # Keep noise level consistent
+
+if(slope == 0){
+noise_level <- sd(adult_weightFrac)*0.9
+}else
+  {
+  noise_level <- sd(adult_weightFrac)*0.000001
+  }# Keep noise level consistent
+
 intercept<-min(adult_weightFrac)
 simNeo <- intercept+slope * adult_weightFrac + rnorm(nrow(cutData), mean = mean(adult_weightFrac), sd = noise_level)
 simNeo[simNeo < 0] <- 0
 cutData$simNeo<-simNeo
+
 #pgls model
-adult.weight.neo<-pglsSEyPagel(simNeo~log10(adult_weight),data=cutData,tree=pruned.tree,se=SE,method = "ML")
+tryCatch({
+#cat("attempting pgls")
+adult.weight.neo<-withTimeout({pglsSEyPagel(simNeo~log10(adult_weight),data=cutData,tree=pruned.tree,se=SE,method = "ML")}, timeout = 500, onTimeout = "error")
 
 summary(adult.weight.neo) 
 
@@ -405,12 +440,20 @@ r.v.adult.weight.neo <-signif(as.numeric(r.v.adult.weight.neo)^2, digits= 2)
 p.v.adult.weight.neo<-summary(adult.weight.neo)$tTable
 p.v.adult.weight.neo<-signif(p.v.adult.weight.neo[2,4], digits = 2)
 slope.adult.weight.neo<-summary(adult.weight.neo)$coefficients[2]
+pglsPagel_row <- data.frame(n = nrow(cutData),min = min_necropsies, model = "PGLSSEY", pval = p.v.adult.weight.neo,simslope= slope, slope = slope.adult.weight.neo)
 
+}, error = function(e) {
+  # If an error occurs, assign NA to these variables
+  pglsPagel_row <- data.frame(n = nrow(cutData),min = min_necropsies, model = "PGLSSEY", pval = NA, simslope = NA, slope = NA)
+  
+  cat("error in optim")
+})
 
 
 
 tryCatch({
-  adult.weight.neoOptim<-pgls.SEy.Optim(simNeo~log10(adult_weight),data=cutData,tree=pruned.tree,se=SE,glsMethod = "ML",model = "OU")
+  #cat("attempting optim")
+  adult.weight.neoOptim<-withTimeout({pgls.SEy.Optim(simNeo~log10(adult_weight),data=cutData,tree=pruned.tree,se=SE,glsMethod = "ML",model = "OU")}, timeout = 500, onTimeout = "error")
   
   r.v.adult.weight.neoOptim <- summary(adult.weight.neoOptim)$corBeta
   r.v.adult.weight.neoOptim <- format(r.v.adult.weight.neoOptim[2,1])
@@ -427,12 +470,14 @@ tryCatch({
   cat("error in optim")
 })
 
-
-NeoplasiaOccurences<-round(as.numeric(cutData$simNeo*cutData$SimulatedNecropsies))
-NonOccurences<-round(cutData$SimulatedNecropsies- NeoplasiaOccurences)
+NeoplasiaOccurences<-round(simNeo * cutData$SimulatedNecropsies)
+NonOccurences<-cutData$SimulatedNecropsies - NeoplasiaOccurences
 adultWeight<-log10(cutData$adult_weight)
 pglsPagel_row <- data.frame(n = nrow(cutData),min = min_necropsies, model = "PGLSSEY", pval = p.v.adult.weight.neo,simslope= slope, slope = slope.adult.weight.neo)
 tryCatch({
+  min_length <- 0.001  # Define the minimum branch length desired
+  pruned.tree$edge.length[pruned.tree$edge.length < min_length] <- min_length
+  #cat("attempting gee")
   compar_row <- withTimeout({
     compar <- suppressMessages(compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~ adultWeight, phy = pruned.tree, family = "binomial"))
     cNpval <- foo(compar)[2,4] # Assuming summary(compar) returns the correct structure
@@ -441,7 +486,7 @@ tryCatch({
   }, timeout = 60, onTimeout = "error")
 }, error = function(e) {
   # If an error occurs, or if the timeout is exceeded, assign NA to these variables
-  cat("gee time out/ error")
+  cat("gee time out/ error: ", e$message, "\n", file = stderr())
   compar_row <- data.frame(n = nrow(cutData), min = min_necropsies, model = "Compar", pval = NA, simslope = NA, slope = NA)
 })
 # ggplot(cutData, aes(x = adultWeight, y = NeoplasiaOccurences / (NeoplasiaOccurences + NonOccurences))) +
@@ -450,18 +495,18 @@ tryCatch({
 #   theme_minimal()
 
 
-all_results[[length(all_results) + 1]] <- rbind(pglsPagel_row,pglsPagelOptim_row, compar_row)
+# Save the results to the CSV file after each iteration
+write.table(rbind(pglsPagel_row, pglsPagelOptim_row, compar_row), file = csv_file_path, sep = ",", col.names = FALSE, append = TRUE, row.names = FALSE)
 
+all_results[[length(all_results) + 1]] <- rbind(pglsPagel_row, pglsPagelOptim_row, compar_row)
 # Combine results for this simulation
 #dataReport <- rbind(dataReport, pglsPagel_row, compar_row)
-
+      }
       }
     }
-  }
   result_rows <- do.call(rbind, all_results)
   return(result_rows)
 }
-
 
 
 
@@ -514,5 +559,5 @@ levelgee<-gesssig/nrow(gessesults)
 
 
 
-write.csv(final_results, file = "./pglsOUSimResults812.csv")
+write.csv(final_results, file = "./pglsOUSimResultsfinal822.csv")
 
