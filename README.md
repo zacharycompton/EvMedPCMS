@@ -58,4 +58,6 @@ Newick tree for min1 species
 ### min20Fixed516.nwk
 Newick tree for min20 species
 
+---
+
 
