@@ -57,16 +57,22 @@ lambda_tree$edge.length[lambda_tree$edge.length <= 0] <- 1e-10
 name.check(lambda_tree, x)
 
 
- pagel<-vector(); 
- N<-length(lambda_tree$tip); M<-lambda_tree$Nnode
-# transform the tree by alpha
-  
- # compute the PIC "root" state for each internal node
-   for(i in 1:M+N){
-     pagel[i-N]<-ace(x,multi2di(root(pruned.tree,node=i)),
-                 method="pic")$ace[1]
-    names(pagel)[i-N]<-i
-  }
+
+pagel<-anc.ML(lambda_tree, x, model = "BM")
+
+pagel<-pagel$ace
+
+# 
+#  pagel<-vector(); 
+#  N<-length(lambda_tree$tip); M<-lambda_tree$Nnode
+#  
+#   
+#  # compute the PIC "root" state for each internal node
+#    for(i in 1:M+N){
+#      pagel[i-N]<-ace(x,multi2di(root(pruned.tree,node=i)),
+#                  method="pic")$ace[1]
+#     names(pagel)[i-N]<-i
+#   }
 
 
 obj <- contMap(lambda_tree, x, method = "user", anc.states = pagel, plot = TRUE)

@@ -36,6 +36,9 @@ lambdasAll<-data.frame(Class = NULL, lambda = NULL)
 kappasAll<-data.frame(Class = NULL, kappa = NULL)
 deltasAll<-data.frame(Class = NULL, delta = NULL)
 
+x <- asin(sqrt(x))
+
+
 fitEB_simAll <- fitContinuous(pruned.tree, x, model = "EB")
 fitBM_simAll <- fitContinuous(pruned.tree, x, model = "BM")
 fitOU_simAll <- fitContinuous(pruned.tree, x, model = "OU")
@@ -107,60 +110,61 @@ for (class_name in ClassNames) {
   rownames(cutData) <- cutData$Species
   pruned.tree$edge.length[pruned.tree$edge.length <= 0] <- 1e-10
   x <- setNames(as.numeric(cutData[, 2]), cutData[, 1])
+  x <- asin(sqrt(x))
   
   name.check(pruned.tree, x)
   
   tryCatch({
-      fitEB_sim <- fitContinuous(pruned.tree, x, model = "EB")
-      fitBM_sim <- fitContinuous(pruned.tree, x, model = "BM")
-      fitOU_sim <- fitContinuous(pruned.tree, x, model = "OU")
-      fitLambda_sim <- fitContinuous(pruned.tree, x, model="lambda")
-      fitKappa_sim <- fitContinuous(pruned.tree, x, model="kappa")
-      fitDelta_sim <- fitContinuous(pruned.tree, x, model="delta")
-      fitRateTrend_sim <- fitContinuous(pruned.tree, x, model = "rate_trend")
-      fitMeanTrend_sim <- fitContinuous(pruned.tree, x, model = "mean_trend")
-      fitWhite_sim <- fitContinuous(pruned.tree, x, model = "white")
-      lambdarow<-data.frame(Class = class_name, lambda = fitLambda_sim$opt$lambda)
-      lambdasClass<-rbind(lambdasClass,lambdarow)
-      
-      kapparow<-data.frame(Class = class_name, kappa = fitKappa_sim$opt$kappa)
-      kappasClass<-rbind(kappasClass,kapparow)
-      
-      deltarow<-data.frame(Class = class_name, delta = fitDelta_sim$opt$delta)
-      deltasClass<-rbind(deltasClass,deltarow)
-      
-      
-      # Bind the test results as you defined
-      testResults <- rbind(
-        data.frame(Class = class_name, BestModel = "EB", LogLik = fitEB_sim$opt$aic, nSpecies = length(x)),
-        data.frame(Class = class_name, BestModel = "BM", LogLik = fitBM_sim$opt$aic, nSpecies = length(x)),
-        data.frame(Class = class_name, BestModel = "OU", LogLik = fitOU_sim$opt$aic, nSpecies = length(x)),
-        data.frame(Class = class_name, BestModel = "rate_trend", LogLik = fitRateTrend_sim$opt$aic, nSpecies = length(x)),
-        data.frame(Class = class_name, BestModel = "mean_trend", LogLik = fitMeanTrend_sim$opt$aic, nSpecies = length(x)),
-        data.frame(Class = class_name, BestModel = "white", LogLik = fitWhite_sim$opt$aic, nSpecies = length(x)),        
-        data.frame(Class = class_name, BestModel = "lambda", LogLik = fitLambda_sim$opt$aic, nSpecies = length(x)),
-        data.frame(Class = class_name, BestModel = "kappa", LogLik = fitKappa_sim$opt$aic, nSpecies = length(x)),
-        data.frame(Class = class_name, BestModel = "delta", LogLik = fitDelta_sim$opt$aic, nSpecies = length(x))
-      )
-      
-      # Find the minimum LogLik and the row associated with it
-      #max_row <- testResults[which.min(testResults$LogLik), ]
-      
-      sorted_results <- testResults[order(testResults$LogLik), ]
-      
-      # Check if the top three AIC scores are within 1 of each other
-      if ((sorted_results$LogLik[3] - sorted_results$LogLik[1]) <= 3) {
-        # If "lambda" is among the top three models, select it as the best model
-        if ("lambda" %in% sorted_results$BestModel[1:3]) {
-          max_row <- sorted_results[sorted_results$BestModel == "lambda", ][1, ]
-        } else {
-          # If "lambda" is not among the top three, select the model with the lowest AIC
-          max_row <- sorted_results[1, ]
-        }
+    fitEB_sim <- fitContinuous(pruned.tree, x, model = "EB")
+    fitBM_sim <- fitContinuous(pruned.tree, x, model = "BM")
+    fitOU_sim <- fitContinuous(pruned.tree, x, model = "OU")
+    fitLambda_sim <- fitContinuous(pruned.tree, x, model="lambda")
+    fitKappa_sim <- fitContinuous(pruned.tree, x, model="kappa")
+    fitDelta_sim <- fitContinuous(pruned.tree, x, model="delta")
+    fitRateTrend_sim <- fitContinuous(pruned.tree, x, model = "rate_trend")
+    fitMeanTrend_sim <- fitContinuous(pruned.tree, x, model = "mean_trend")
+    fitWhite_sim <- fitContinuous(pruned.tree, x, model = "white")
+    lambdarow<-data.frame(Class = class_name, lambda = fitLambda_sim$opt$lambda)
+    lambdasClass<-rbind(lambdasClass,lambdarow)
+    
+    kapparow<-data.frame(Class = class_name, kappa = fitKappa_sim$opt$kappa)
+    kappasClass<-rbind(kappasClass,kapparow)
+    
+    deltarow<-data.frame(Class = class_name, delta = fitDelta_sim$opt$delta)
+    deltasClass<-rbind(deltasClass,deltarow)
+    
+    
+    # Bind the test results as you defined
+    testResults <- rbind(
+      data.frame(Class = class_name, BestModel = "EB", LogLik = fitEB_sim$opt$aic, nSpecies = length(x)),
+      data.frame(Class = class_name, BestModel = "BM", LogLik = fitBM_sim$opt$aic, nSpecies = length(x)),
+      data.frame(Class = class_name, BestModel = "OU", LogLik = fitOU_sim$opt$aic, nSpecies = length(x)),
+      data.frame(Class = class_name, BestModel = "rate_trend", LogLik = fitRateTrend_sim$opt$aic, nSpecies = length(x)),
+      data.frame(Class = class_name, BestModel = "mean_trend", LogLik = fitMeanTrend_sim$opt$aic, nSpecies = length(x)),
+      data.frame(Class = class_name, BestModel = "white", LogLik = fitWhite_sim$opt$aic, nSpecies = length(x)),        
+      data.frame(Class = class_name, BestModel = "lambda", LogLik = fitLambda_sim$opt$aic, nSpecies = length(x)),
+      data.frame(Class = class_name, BestModel = "kappa", LogLik = fitKappa_sim$opt$aic, nSpecies = length(x)),
+      data.frame(Class = class_name, BestModel = "delta", LogLik = fitDelta_sim$opt$aic, nSpecies = length(x))
+    )
+    
+    # Find the minimum LogLik and the row associated with it
+    #max_row <- testResults[which.min(testResults$LogLik), ]
+    
+    sorted_results <- testResults[order(testResults$LogLik), ]
+    
+    # Check if the top three AIC scores are within 1 of each other
+    if ((sorted_results$LogLik[3] - sorted_results$LogLik[1]) <= 3) {
+      # If "lambda" is among the top three models, select it as the best model
+      if ("lambda" %in% sorted_results$BestModel[1:3]) {
+        max_row <- sorted_results[sorted_results$BestModel == "lambda", ][1, ]
       } else {
-        # If the top three AIC scores are not within 1 of each other, select the model with the lowest AIC
+        # If "lambda" is not among the top three, select the model with the lowest AIC
         max_row <- sorted_results[1, ]
       }
+    } else {
+      # If the top three AIC scores are not within 1 of each other, select the model with the lowest AIC
+      max_row <- sorted_results[1, ]
+    }
     resultsClass<-rbind(resultsClass, max_row)
   }, error = function(e) {
     cat("Error encountered: ", e$message, "\nAttempting to reorder tree and retry.\n")
@@ -175,7 +179,7 @@ for (class_name in ClassNames) {
       fitRateTrend_sim <- fitContinuous(reordered_tree, x, model = "rate_trend")
       fitMeanTrend_sim <- fitContinuous(reordered_tree, x, model = "mean_trend")
       fitWhite_sim <- fitContinuous(reordered_tree, x, model = "white")
-
+      
       
       
       testResults <- rbind(
@@ -283,6 +287,7 @@ deltasOrder<-data.frame(Order = NULL, delta = NULL)
 kappasOrder<-data.frame(Order = NULL, kappa = NULL)
 
 
+
 for (class_name in OrderNames) {
   tree <- read.tree("min20Fixed516.nwk")
   filterData <- filter(Data, Orders == class_name)
@@ -304,6 +309,8 @@ for (class_name in OrderNames) {
   rownames(cutData) <- cutData$Species
   pruned.tree$edge.length[pruned.tree$edge.length <= 0] <- 1e-10
   x <- setNames(as.numeric(cutData[, 2]), cutData[, 1])
+  
+  x <- asin(sqrt(x))
   
   name.check(pruned.tree, x)
   
@@ -482,8 +489,8 @@ for (i in 1:nrow(modelsBestFitClass)) {
     painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state="Rate Trend", anc="0")
   }else if (modelsBestFitClass$BestModel[i] == "lambda") {
     classLambda<-left_join(Class_data, lambdasClass, by = "Class")
-      #painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state=paste("Lambda~",round(classLambda$lambda[1],1) ), anc="0")
-      painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state="Pagel's Lambda", anc="0")
+    #painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state=paste("Lambda~",round(classLambda$lambda[1],1) ), anc="0")
+    painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state="Pagel's Lambda", anc="0")
   }else if (modelsBestFitClass$BestModel[i] == "kappa") {
     classKappa<-left_join(Class_data, kappasClass, by = "Class")
     painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state="Pagel's Kappa", anc="0")
@@ -491,9 +498,9 @@ for (i in 1:nrow(modelsBestFitClass)) {
     classDelta<-left_join(Class_data, deltasClass, by = "Class")
     painted <- paintSubTree(painted, node=findMRCA(painted, Class_data$Species), state="Pagel's Delta", anc="0")
   }
-  }
-    
-  
+}
+
+
 
 
 
@@ -533,7 +540,7 @@ first_element_names <- lapply(painted$maps, function(x) names(x)[1])
 unique(first_element_names)
 
 
-colors <- c("black", "#2E4C6D", "#008080", "gold", "#CC5500", "pink", "#006400")
+colors <- c("black","#2E4C6D", "red", "#008080", "gold", "#CC5500", "pink", "#006400")
 names(colors)<-c("0",unique(first_element_names))
 plotSimmap(painted, lwd=2, split.vertical=TRUE, ftype="i", fsize = 0.0000001, colors = colors)
 
@@ -547,4 +554,4 @@ for (i in 1:nrow(modelsBestFit)) {
 }
 
 
-add.simmap.legend(leg=names(colors)[2:7], colors=colors[2:7])
+add.simmap.legend(leg=names(colors)[2:8], colors=colors[2:8])
