@@ -46,6 +46,9 @@ Scripts for testing different evolutionary models:
 
 ## Addtional Files
 
+## F1errorRates.xlsx
+Average error rates of stat methods
+
 ###  min1LH.csv
 Necropsy data for minimum of 1 species
 
