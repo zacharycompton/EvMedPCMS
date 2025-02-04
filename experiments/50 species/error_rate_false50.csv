@@ -1,0 +1,31 @@
+"","min","model","evo_model","error_type","count","total","rate"
+"1",1,"Compar","OU","False Negative",198,998,0.198396793587174
+"2",1,"Compar","Pagel's Lambda","False Negative",54,990,0.0545454545454545
+"3",1,"Compar","Random Noise","False Positive",235,982,0.239307535641548
+"4",1,"PGLSSEY","OU","False Negative",157,1000,0.157
+"5",1,"PGLSSEY","Pagel's Lambda","False Negative",10,1000,0.01
+"6",1,"PGLSSEY","Random Noise","False Positive",1,1000,0.001
+"7",1,"PGLSSEYOPTIM","OU","False Negative",156,1000,0.156
+"8",1,"PGLSSEYOPTIM","Pagel's Lambda","False Negative",17,1000,0.017
+"9",5,"Compar","OU","False Negative",153,989,0.154701718907988
+"10",5,"Compar","Pagel's Lambda","False Negative",44,900,0.0488888888888889
+"11",5,"Compar","Random Noise","False Positive",170,946,0.179704016913319
+"12",5,"PGLSSEY","OU","False Negative",132,1000,0.132
+"13",5,"PGLSSEY","Pagel's Lambda","False Negative",7,931,0.0075187969924812
+"14",5,"PGLSSEYOPTIM","OU","False Negative",136,1000,0.136
+"15",5,"PGLSSEYOPTIM","Pagel's Lambda","False Negative",6,931,0.00644468313641246
+"16",10,"Compar","OU","False Negative",156,977,0.159672466734903
+"17",10,"Compar","Pagel's Lambda","False Negative",33,943,0.0349946977730647
+"18",10,"Compar","Random Noise","False Positive",138,901,0.153163152053274
+"19",10,"PGLSSEY","OU","False Negative",141,1000,0.141
+"20",10,"PGLSSEY","Pagel's Lambda","False Negative",13,1000,0.013
+"21",10,"PGLSSEYOPTIM","OU","False Negative",149,1000,0.149
+"22",10,"PGLSSEYOPTIM","Pagel's Lambda","False Negative",13,1000,0.013
+"23",20,"Compar","OU","False Negative",139,956,0.145397489539749
+"24",20,"Compar","Pagel's Lambda","False Negative",34,892,0.0381165919282511
+"25",20,"Compar","Random Noise","False Positive",133,841,0.158145065398335
+"26",20,"PGLSSEY","OU","False Negative",141,1000,0.141
+"27",20,"PGLSSEY","Pagel's Lambda","False Negative",13,1000,0.013
+"28",20,"PGLSSEYOPTIM","OU","False Negative",144,1000,0.144
+"29",20,"PGLSSEYOPTIM","Pagel's Lambda","False Negative",13,1000,0.013
+"30",20,"PGLSSEYOPTIM","Random Noise","False Positive",1,1000,0.001

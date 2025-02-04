@@ -1,0 +1,34 @@
+"","min","model","evo_model","error_type","count","total","rate"
+"1",1,"Compar","OU","False Negative",169,1880,0.0898936170212766
+"2",1,"Compar","Pagel's Lambda","False Negative",139,1172,0.118600682593857
+"3",1,"Compar","Random Noise","False Positive",336,1000,0.336
+"4",1,"PGLSSEY","OU","False Negative",163,1880,0.0867021276595745
+"5",1,"PGLSSEY","Pagel's Lambda","False Negative",121,1177,0.102803738317757
+"6",1,"PGLSSEYOPTIM","OU","False Negative",159,1880,0.0845744680851064
+"7",1,"PGLSSEYOPTIM","Pagel's Lambda","False Negative",114,1177,0.096856414613424
+"8",1,"PGLSSEYOPTIM","Random Noise","False Positive",15,1000,0.015
+"9",5,"Compar","OU","False Negative",163,1897,0.0859251449657354
+"10",5,"Compar","Pagel's Lambda","False Negative",107,1162,0.0920826161790017
+"11",5,"Compar","Random Noise","False Positive",326,999,0.326326326326326
+"12",5,"PGLSSEY","OU","False Negative",160,1897,0.0843437005798629
+"13",5,"PGLSSEY","Pagel's Lambda","False Negative",105,1167,0.089974293059126
+"14",5,"PGLSSEYOPTIM","OU","False Negative",160,1897,0.0843437005798629
+"15",5,"PGLSSEYOPTIM","Pagel's Lambda","False Negative",99,1167,0.0848329048843188
+"16",5,"PGLSSEYOPTIM","Random Noise","False Positive",5,1000,0.005
+"17",10,"Compar","OU","False Negative",172,1899,0.0905739863085835
+"18",10,"Compar","Pagel's Lambda","False Negative",128,1205,0.106224066390041
+"19",10,"Compar","Random Noise","False Positive",290,986,0.294117647058824
+"20",10,"PGLSSEY","OU","False Negative",162,1899,0.0853080568720379
+"21",10,"PGLSSEY","Pagel's Lambda","False Negative",109,1224,0.0890522875816993
+"22",10,"PGLSSEYOPTIM","OU","False Negative",172,1899,0.0905739863085835
+"23",10,"PGLSSEYOPTIM","Pagel's Lambda","False Negative",108,1224,0.0882352941176471
+"24",10,"PGLSSEYOPTIM","Random Noise","False Positive",5,1000,0.005
+"25",20,"Compar","OU","False Negative",180,1895,0.0949868073878628
+"26",20,"Compar","Pagel's Lambda","False Negative",103,1169,0.088109495295124
+"27",20,"Compar","Random Noise","False Positive",249,958,0.259916492693111
+"28",20,"PGLSSEY","OU","False Negative",163,1897,0.0859251449657354
+"29",20,"PGLSSEY","Pagel's Lambda","False Negative",102,1251,0.0815347721822542
+"30",20,"PGLSSEY","Random Noise","False Positive",1,1000,0.001
+"31",20,"PGLSSEYOPTIM","OU","False Negative",163,1897,0.0859251449657354
+"32",20,"PGLSSEYOPTIM","Pagel's Lambda","False Negative",99,1251,0.079136690647482
+"33",20,"PGLSSEYOPTIM","Random Noise","False Positive",10,1000,0.01

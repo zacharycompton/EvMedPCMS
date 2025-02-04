@@ -35,7 +35,9 @@ error_rates <- all_results %>%
   ungroup() %>%
   mutate(rate = count / total)
 
+error_rate_false<-filter(error_rates, error_type != "Correct")
 
+write.csv(error_rate_false, "error_rate_false50.csv")
 
 # Filter for False Negative and False Positive rates
 filtered_rates <- error_rates %>%
