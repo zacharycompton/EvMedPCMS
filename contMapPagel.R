@@ -11,7 +11,7 @@ library(RRphylo)
 #library(RColorBrewer)
 
 
-Data <- read.csv("min20516.csv")
+Data <- read.csv("min20-2022.05.16.csv")
 
 tree <- read.tree("min20Fixed516.nwk")
 #for malignancy
@@ -88,18 +88,18 @@ names(x_binary)<-names(x)
 
 lambda_tree$edge.length[lambda_tree$edge.length <= 0] <- 1e-10
 
-threshOU<-ancThresh(lambda_tree,x_binary, model = "lambda")
+#threshOU<-ancThresh(lambda_tree,x_binary, model = "lambda")
 
 
 # # Min-Max Scaling to range [-1, 1]
 # range_val <- max(abs(branch_rates))
 # scaled_branch_rates <- branch_rates / range_val
-pallete<-c("darkgrey", "pink")
+pallete<-c("black", "white")
 
 plot(lambda_tree,no.margin=TRUE,edge.width=2,cex=0.7)
 #percentage_labels <- sprintf("%.2f%%", branches * 100)
 #labelnodes(text = percentage_labels,node=1:tree$Nnode+Ntip(tree),circle.exp = 0.9, interactive = FALSE)
-nodelabels(pie=threshOU$ace,piecol=pallete[1:2],cex=0.8)
+nodelabels(pie=pagel,cex=0.8)
 
 
 
@@ -107,12 +107,11 @@ nodelabels(pie=threshOU$ace,piecol=pallete[1:2],cex=0.8)
 obj <- contMap(lambda_tree, x, method = "user", anc.states = pagel, plot = TRUE)
 obj <- setMap(obj, invert = TRUE,topo.colors(n=20))
 plot(obj,legend = FALSE, fsize = 0.001, leg.txt = paste("Malignancy Evo Rate Pagel, Lambda ~", round(pagelFit$opt$lambda,2)), type = "fan")
-nodelabels(pie=threshOU$ace,piecol=pallete[1:2],cex=0.3)
+nodelabels(pie=pagel,piecol=pallete[1:2],cex=0.3)
 
 legend("bottomright",                  # Position of the legend in the plot
-       legend = c("No Cancer", "Cancer"),  # Labels for each category
-       fill = pallete[1:2],       # Colors used in the pie charts
-       title = "Cancer Threshold",      # Title of the legend
+       legend = c("Malignancy Prevalence"),  # Labels for each category
+       fill = pallete[1:1],       # Colors used in the pie charts
        cex = 0.8)    
 
 add.color.bar(100,obj$cols,title= paste("Malignancy Prevalence, Lambda ~", round(pagelFit$opt$lambda,2)),
