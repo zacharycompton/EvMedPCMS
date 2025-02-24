@@ -42,13 +42,11 @@ pruned.tree$edge.length[pruned.tree$edge.length <= 0] <- 1e-10
 x <- setNames(as.numeric(cutDataAll[, 2]), cutDataAll[, 1])
 
 
-tree<-multi2di(tree,random=TRUE)
-is.binary(tree)
 
 name.check(pruned.tree, x)
 
 #edgelabels()
-N<-length(pruned.tree$tip.label)
+#N<-length(pruned.tree$tip.label)
 
 #fit<-fitContinuous(tree, x, model = "OU")
 
@@ -61,11 +59,9 @@ name.check(lambda_tree, x)
 
 
 
-pagel<-anc.ML(lambda_tree, x, model = "BM")
+A<-anc.ML(lambda_tree, x, model = "BM", CI = TRUE)
 
-A<-fastAnc(lambda_tree,x,CI=TRUE)
-
-
+#A<-fastAnc(lambda_tree,x,CI=TRUE)
 
 
 
